@@ -1,0 +1,96 @@
+import React from "react";
+import {
+  Box,
+  Button,
+  Dialog,
+  DialogTitle,
+  Grid,
+  makeStyles,
+  TextField,
+} from "@material-ui/core";
+import { createCamp } from "../model";
+import { useAppDispatch } from "../redux/hooks";
+import { sendUserOperation } from "../redux/reducers/campReducer";
+
+const useStyles = makeStyles((theme) => ({
+  textfield: {
+    margin: theme.spacing(2),
+    textAlign: "center",
+  },
+  button: {
+    margin: theme.spacing(2),
+  },
+}));
+
+interface CreateCampProps {
+  onClose: () => void;
+  open: boolean;
+}
+
+const CreateCamp: React.FC<CreateCampProps> = (props) => {
+  const classes = useStyles();
+  const { onClose, open } = props;
+  const [campName, setCampName] = React.useState("");
+  const campsDispatch = useAppDispatch();
+
+  const handleCreate = () => {
+    campsDispatch(sendUserOperation(createCamp(campName)));
+    setCampName("");
+    onClose();
+  };
+
+  return (
+    <Dialog
+      onClose={() => onClose()}
+      aria-labelledby="simple-dialog-title"
+      open={open}
+      maxWidth="xs"
+    >
+      <Box p={4}>
+        <DialogTitle id="simple-dialog-title">Create a camp</DialogTitle>
+        <Grid container spacing={2}>
+          <Grid item xs={12}>
+            <TextField
+              label="Camp name"
+              value={campName}
+              onChange={(e) => setCampName(e.target.value)}
+              autoFocus
+              onKeyDown={(e) => {
+                if (campName && e.key === "Enter") {
+                  handleCreate();
+                }
+              }}
+              className={classes.textfield}
+            />
+          </Grid>
+          <Grid item xs="auto">
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={handleCreate}
+              disabled={!campName}
+              className={classes.button}
+            >
+              Create
+            </Button>
+          </Grid>
+          <Grid item xs="auto">
+            <Button
+              variant="outlined"
+              color="primary"
+              onClick={() => {
+                setCampName("");
+                onClose();
+              }}
+              className={classes.button}
+            >
+              Cancel
+            </Button>
+          </Grid>
+        </Grid>
+      </Box>
+    </Dialog>
+  );
+};
+
+export default CreateCamp;
